@@ -3,7 +3,7 @@
 
 template<typename A, typename B>
 struct SizeOfCmp {
-  using Type = ToBoolT<sizeof(A) < sizeof(B)>;
+  using Type = ToBoolT<sizeof(A) <= sizeof(B)>;
 };
 
 PRINT_TYPE(MetaSortByT<SizeOfCmp, Nil>);

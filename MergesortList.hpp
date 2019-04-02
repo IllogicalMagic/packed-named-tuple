@@ -12,7 +12,7 @@ struct MergeImpl {
   using Cond = typename Cmp<HeadT<Xs>, HeadT<Ys>>::Type;
   using Hd = IfT<Cond, HeadT<Xs>, HeadT<Ys>>;
   using Tl = typename IfT<Cond, Tail<Xs>, Tail<Ys>>::Type;
-  using MIRest = typename IfT<Cond, MergeImpl<Cmp, As, Tl, Ys>, MergeImpl<Cmp, As, Tl, Xs>>::Type;
+  using MIRest = typename IfT<Cond, MergeImpl<Cmp, As, Tl, Ys>, MergeImpl<Cmp, As, Xs, Tl>>::Type;
   using Type = List<Hd, MIRest>;
 };
 
