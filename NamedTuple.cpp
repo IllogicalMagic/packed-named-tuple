@@ -7,7 +7,14 @@
 #include "PNTuple.hpp"
 #include "Printer.hpp"
 
-struct Empty {};
+struct Empty {
+  Empty() { std::cout << "Constructed" << std::endl; }
+  Empty(const Empty &) { std::cout << "Copy constructed" << std::endl; }
+  Empty(Empty &&) { std::cout << "Move constructed" << std::endl; }
+  void operator=(const Empty &) { std::cout << "Copy assigned" << std::endl; }
+  void operator=(Empty &&) { std::cout << "Move assigned" << std::endl; }
+  ~Empty() { std::cout << "Destructed" << std::endl; }
+};
 
 int main() {
   using namespace std::string_literals;

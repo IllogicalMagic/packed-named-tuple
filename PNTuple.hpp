@@ -321,7 +321,7 @@ constexpr auto makePNTupleImpl(std::index_sequence<Is...> &&, Ts&&...ts) {
   auto T = std::forward_as_tuple(std::forward<Ts>(ts)...);
   return PNTuple<TupleField<std::remove_reference_t<decltype(std::get<Is * 2>(T))>,
                             typename DeducePNType<decltype(std::get<Is * 2 + 1>(T))>::Type>...>
-                 (std::get<Is * 2 + 1>(T)...);
+    (std::get<Is * 2 + 1>(std::move(T))...);
 }
 
 template<typename...Ts>
