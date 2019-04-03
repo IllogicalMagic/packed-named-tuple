@@ -76,12 +76,13 @@ struct PNTupleElemEmpty : private T {
 
 // Dispatcher
 template<typename N, typename T, typename I>
-struct PNTupleElemGeneral :
+using PNTupleElemGeneralBase =
   std::conditional_t<std::is_empty_v<T> && !std::is_final_v<T>,
-                     PNTupleElemEmpty<N, T, I>, PNTupleElem<N, T, I>> {
-  using Base =
-    std::conditional_t<std::is_empty_v<T> && !std::is_final_v<T>,
-                       PNTupleElemEmpty<N, T, I>, PNTupleElem<N, T, I>>;
+                     PNTupleElemEmpty<N, T, I>, PNTupleElem<N, T, I>>;
+
+template<typename N, typename T, typename I>
+struct PNTupleElemGeneral : PNTupleElemGeneralBase<N, T, I> {
+  using Base = PNTupleElemGeneralBase<N, T, I>;
 
   using Base::get;
   
@@ -121,13 +122,12 @@ struct SizeOfCmp<PNTupleElemGeneral<AN, AT, AI>,
 // }} Comparator
 
 // Intermediate base with unsorted tuple elements {{
-template<typename SE>
-struct PNTupleImpl;
+template<typename Es>
+using PNTupleImplBase = PNTupleImplSorted<FromListT<MetaSortByT<SizeOfCmp, ToListT<Es>>>, Es>;
 
-template<typename...Es>
-struct PNTupleImpl<Seq<Es...>>
-  : PNTupleImplSorted<FromListT<MetaSortByT<SizeOfCmp, ToListT<Seq<Es...>>>>, Seq<Es...>> {
-  using Base = PNTupleImplSorted<FromListT<MetaSortByT<SizeOfCmp, ToListT<Seq<Es...>>>>, Seq<Es...>>;
+template<typename Es>
+struct PNTupleImpl : PNTupleImplBase<Es>, Assert<IsSeq<Es>> {
+  using Base = PNTupleImplBase<Es>;
 
   using Base::get;
 
@@ -154,14 +154,14 @@ struct ZipElem<TupleField<N, T>, I> {
 
 // Main packed named tuple class {{
 template<typename...Fs>
-struct PNTuple :
-  Assert<IsTupleField<Fs>...>,
+using PNTupleBase =
   PNTupleImpl<ZipWithT<ZipElem,
                        Seq<Fs...>,
-                       decltype(wrapIndices(std::make_index_sequence<sizeof...(Fs)>()))>> {
-  using Base =
-    PNTupleImpl<ZipWithT<ZipElem, Seq<Fs...>,
-                         decltype(wrapIndices(std::make_index_sequence<sizeof...(Fs)>()))>>;
+                       decltype(wrapIndices(std::make_index_sequence<sizeof...(Fs)>()))>>;
+
+template<typename...Fs>
+struct PNTuple : Assert<IsTupleField<Fs>...>, PNTupleBase<Fs...> {
+  using Base = PNTupleBase<Fs...>;
 
   using Base::get;
 
