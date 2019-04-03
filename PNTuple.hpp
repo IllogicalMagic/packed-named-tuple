@@ -11,7 +11,10 @@
 
 // Helpers for tuple creation {{
 template<typename N, typename T>
-struct TupleField;
+struct TupleField  {
+  using Name = N;
+  using Type = T;
+};
 
 template<typename T>
 struct IsTupleField : False {};
@@ -166,6 +169,8 @@ struct PNTuple : Assert<IsTupleField<Fs>...>, PNTupleBase<Fs...> {
   using Base::get;
 
   constexpr PNTuple() = default;
+  // Delegate to base converting constructor
+  constexpr PNTuple(const typename Fs::Type&...ts) : Base(ts...) {}
   template<typename...Vs>
   constexpr PNTuple(Vs&&...vs) : Base(std::forward<Vs>(vs)...) {}
 
